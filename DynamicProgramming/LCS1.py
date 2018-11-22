@@ -7,7 +7,7 @@ def LCSCore(s1, s2):
     end, maxLen = 0, 0
     tag = [0]*n2
     for i in range(n1):
-        for j in range(n2-1,-1,-1):
+        for j in range(n2-1,-1,-1): #要从后往前更新tag数组
             if s1[i] == s2[j]:
                 if i == 0 or j == 0:
                     tag[j] = 1
