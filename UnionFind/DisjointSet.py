@@ -5,7 +5,7 @@
 class DisjointSet:
     #根据nums里的元素初始化一个不相交集
     def __init__(self, nums):
-        self.size = len(nums)
+        self.SetCnt = self.size = len(nums)
         self.__HashMap = dict(zip(nums, range(self.size)))
         self.__DisjSet = [-1]*self.size
 
@@ -37,6 +37,7 @@ class DisjointSet:
         #执行Union操作
         if root1 != root2:
             self.__UnionCore(root1, root2)
+            self.SetCnt -= 1
 
 if __name__ == "__main__":
     nums = ['a','s','d','q','w','e','z','x','c']
