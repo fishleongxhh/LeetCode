@@ -4,7 +4,6 @@
 
 from Tree import *
 
-#逻辑仍有误
 def isValidBSTCore(root, low, high):
     if root:
         rootVal = root.val
