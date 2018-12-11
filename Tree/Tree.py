@@ -3,6 +3,8 @@
 # 此程序主要涉及到二叉树的一些基本操作
 # 定义二叉树，初始化二叉查找树，先序、中序、后序遍历二叉树
 
+from collections import deque #为了实现非递归的层次遍历，需要使用队列
+
 class TreeNode:
     def __init__ (self, x):
         self.val = x
@@ -96,6 +98,20 @@ def preOrderScan(rootNode, res=''):
     res = preOrderScan(rootNode.right, res)
     return res
 
+#使用非递归的方式完成先序遍历
+def preOrderScan2(rootNode):
+    res = []
+    stack = []
+    while rootNode or stack:
+        while rootNode:
+            stack.append(rootNode) #不断地将左儿子压入栈
+            rootNode = rootNode.left
+        if stack:
+            rootNode = stack.pop()
+            res.append(rootNode.val)
+            rootNode = rootNode.right #弹出栈顶元素，存储值，然后访问右儿子
+    return res
+
 def midOrderScan(rootNode, res=''):
     if rootNode == None:
         return res + ''
@@ -104,12 +120,66 @@ def midOrderScan(rootNode, res=''):
     res = midOrderScan(rootNode.right, res)
     return res
 
+#使用非递归的方式完成中序遍历
+def midOrderScan2(rootNode):
+    res = [] #存储结果
+    stack = [] #存储历史访问节点的栈
+    while rootNode or stack:
+        while rootNode:
+            res.append(rootNode.val)
+            stack.append(rootNode)
+            rootNode = rootNode.left #不停地打印左儿子,直至为空
+        if stack:
+            rootNode = stack.pop().right #当前所有左儿子都打印结束后，访问右儿子
+    return res
+
 def postOrderScan(rootNode, res=''):
     if rootNode == None:
         return res + ''
     res = postOrderScan(rootNode.left, res)
     res = postOrderScan(rootNode.right, res)
     res = res + '->' + str(rootNode.val)
+    return res
+
+#使用非递归的方式完成后序遍历
+def postOrderScan2(rootNode):
+    if not rootNode:
+        return []
+    res = []
+    stack = []
+    stack.append(rootNode)
+    pre = None #记录上一次访问的节点
+    while stack:
+        #查看栈顶元素
+        rootNode = stack[-1]
+        #如果栈顶元素的左右儿子均为空，则可以访问；如果上一次访问的节点非空且为栈顶元素的左儿子或者右儿子，那么也可以访问
+        if (rootNode.left is None and rootNode.right is None) or (pre is not None and (pre == rootNode.left or pre == rootNode.right)):
+            res.append(rootNode.val)
+            pre = stack.pop() #访问栈顶元素并弹出
+        else:
+            #如果栈顶元素不能访问，那么先将右儿子压入栈，再将左儿子压入栈！！注意先后顺序，因为日后要保证先访问左儿子才能访问右儿子！
+            if rootNode.right:
+                stack.append(rootNode.right)
+            if rootNode.left:
+                stack.append(rootNode.left)
+    return res
+
+#使用非递归的方式实现层次遍历
+def levelOrderScan(rootNode):
+    if not rootNode:
+        return []
+    res = []
+    queue = deque()
+    queue.append(rootNode)
+    while queue:
+        #弹出队首元素
+        rootNode = queue.popleft()
+        #将左右儿子压入队尾
+        if rootNode.left:
+            queue.append(rootNode.left)
+        if rootNode.right:
+            queue.append(rootNode.right)
+        res.append(rootNode.val)
     return res
 
 def treeScan(rootNode):
@@ -121,8 +191,12 @@ def treeScan(rootNode):
     print(postOrderScan(rootNode))
 
 if __name__ == "__main__":
-    nums1 = [5,1,3,2,7,9,8]
+    nums1 = [5,3,8,1,4,6,9,0,2,7,10]
+    nums1 = []
     print(nums1)
     rootNode1 = initTree(nums1)
     treeScan(rootNode1)
-
+    print(preOrderScan2(rootNode1))
+    print(midOrderScan2(rootNode1))
+    print(postOrderScan2(rootNode1))
+    print(levelOrderScan(rootNode1))

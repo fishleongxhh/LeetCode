@@ -2,28 +2,49 @@
 # Author: Xu Hanhui
 # 此程序用来求解LeetCode5: Longest Palindromic Substring问题
 
-#此解法有误！
-#此程序用来求解两个字符串的最长公共字串
-def LCS(s1, s2):
-    m, n = len(s1), len(s2)
-    if (not m) or (not n):
-        return ''
-    flag = [0]*n
-    maxLen, end = 0, -1
-    for i in range(m):
-        for j in range(n-1, -1, -1): #从后往前更新tag数组
-            if s1[i] == s2[j]:
-                flag[j] = 1 if i == 0 or j == 0 else flag[j-1] + 1
-            else:
-                flag[j] = 0
-            if flag[j] > maxLen:
-                maxLen, end = flag[j], j
-    return s2[(end+1-maxLen):(end+1)]
-
+#Dynamic Programming
 def longestPalindrome(s):
-    return LCS(s, s[::-1])
+    n = len(s)
+    MaxLen = start = end = 0
+    tag = [False]*n #在第j个循环中，tag[i]记录s[i:j+1]子字符串是否是回文串
+    for j in range(n): #列
+        for i in range(j+1): #行
+            if i == j:
+                tag[i] = True
+            elif i == (j-1):
+                tag[i] = (s[i]==s[j])
+            else:
+                tag[i] = tag[i+1] and (s[i]==s[j])
+            if tag[i] and (j-i+1) > MaxLen:
+                MaxLen = (j-i+1)
+                start, end = i, j+1
+    return s[start:end]
+
+#Expand Around Center
+#从start和end往两边扩散，找到最长的回文串
+def expandAroundCenter(s, start, end):
+    while start >=0 and end < len(s) and s[start] == s[end]:
+        start, end = start-1, end+1
+    #注意，循环完成之后最长的回文串为s[start+1:end-1]
+    return end-start-1
+
+def longestPalindrome2(s):
+    n = len(s)
+    MaxLen = start = end = 0
+    for i in range(n):
+        len1 = expandAroundCenter(s, i, i)
+        if i == n-1:
+            len2 = 0
+        else:
+            len2 = expandAroundCenter(s, i, i+1)
+        CurrLen = max(len1, len2)
+        if CurrLen > MaxLen:
+            MaxLen = CurrLen
+            start, end = i-(MaxLen-1)//2, i+MaxLen//2
+    return s[start:(end+1)]
 
 if __name__ == "__main__":
-    s = "avhfuafhabbbbbba"
+    s = "vhashfjayuhfagfqyuhfbsjzbzbzhf"
     print(s)
     print(longestPalindrome(s))
+    print(longestPalindrome2(s))
